@@ -95,5 +95,5 @@ class AuthService(auth_pb2_grpc.AuthServiceServicer):
 
         return auth_pb2.DecodeTokenResponse(
             user_id=str(payload["user_id"]),
-            identifier=payload.get("identifier", ""),
+            email=payload.get("email", ""),
         )
