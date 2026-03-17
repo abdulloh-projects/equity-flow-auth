@@ -2,4 +2,5 @@ from django.apps import AppConfig
 
 
 class OtpConfig(AppConfig):
-    name = 'otp'
+    name = "app.otp"
+    label = "otp"
