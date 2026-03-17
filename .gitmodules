@@ -1,0 +1,3 @@
+[submodule "src/external/equity-flow-auth"]
+	path = src/external/equity-flow-auth
+	url = https://github.com/abdulloh-projects/equity-flow-auth-grpc.git
