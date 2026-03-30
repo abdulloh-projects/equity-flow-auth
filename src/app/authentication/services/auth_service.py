@@ -7,6 +7,12 @@ from config.settings import SECRET_KEY
 from django.db import transaction
 from rest_framework_simplejwt.tokens import RefreshToken
 
+ROLE_MAP = {
+    "investor": auth_pb2.INVESTOR,
+    "admin": auth_pb2.ADMIN,
+    "startupper": auth_pb2.STARTUPPER,
+}
+
 
 class AuthService(auth_pb2_grpc.AuthServiceServicer):
     def Register(self, request, context):
@@ -26,11 +32,11 @@ class AuthService(auth_pb2_grpc.AuthServiceServicer):
                         success=True,
                         message="Registration successful",
                         data=auth_pb2.UserData(
-                            user_id=user.id,
+                            user_id=str(user.id),
                             email=user.email,
                             first_name=user.first_name,
                             last_name=user.last_name,
-                            role=user.role,
+                            role=ROLE_MAP.get(user.role, auth_pb2.INVESTOR),
                         ),
                     )
                 else:
@@ -53,11 +59,10 @@ class AuthService(auth_pb2_grpc.AuthServiceServicer):
                     success=True,
                     message="Login successful",
                     data=auth_pb2.LoginData(
-                        user_id=user.id,
+                        user_id=str(user.id),
                         first_name=user.first_name,
                         last_name=user.last_name,
                         email=user.email,
-                        role=user.role,
                         access_token=str(refresh.access_token),
                         refresh_token=str(refresh),
                     ),
@@ -78,25 +83,25 @@ class AuthService(auth_pb2_grpc.AuthServiceServicer):
                 message=str(e),
             )
 
-    def SendOTP(self, request, context):
+    def SendOtp(self, request, context):
         service = OTPService(request.email)
         success = service.send_otp()
         if success:
-            return auth_pb2.SendOTPResponse(
+            return auth_pb2.SendOtpResponse(
                 success=True, message="OTP sent successfully"
             )
         else:
-            return auth_pb2.SendOTPResponse(success=False, message="Failed to send OTP")
+            return auth_pb2.SendOtpResponse(success=False, message="Failed to send OTP")
 
-    def VerifyOTP(self, request, context):
+    def VerifyOtp(self, request, context):
         service = OTPService(request.email, request.otp)
         success = service.verify_otp()
         if success:
-            return auth_pb2.VerifyOTPResponse(
+            return auth_pb2.VerifyOtpResponse(
                 success=True, message="OTP verified successfully"
             )
         else:
-            return auth_pb2.VerifyOTPResponse(
+            return auth_pb2.VerifyOtpResponse(
                 success=False, message="Failed to verify OTP"
             )
 

@@ -1,4 +1,5 @@
 import random
+from datetime import timedelta
 
 import requests
 from django.conf import settings
@@ -22,7 +23,7 @@ class OTPService:
             email=self.email,
             defaults={
                 "otp": otp,
-                "expires_at": timezone.now() + timezone.timedelta(minutes=5),
+                "expires_at": timezone.now() + timedelta(minutes=5),
                 "is_verified": False,
             },
         )
@@ -31,7 +32,8 @@ class OTPService:
         try:
             url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT}/sendMessage"
             payload = {"chat_id": settings.TELEGRAM_GROUP_ID, "text": message}
-            requests.post(url, json=payload)
+            response = requests.post(url, json=payload)
+            print(response.json())
             return True
         except Exception as e:
             print(f"Error sending OTP: {e}")

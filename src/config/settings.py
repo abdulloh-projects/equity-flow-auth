@@ -111,3 +111,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+
+TELEGRAM_BOT = config("TELEGRAM_BOT", default=None)
+TELEGRAM_GROUP_ID = config("TELEGRAM_GROUP_ID", default=None)
