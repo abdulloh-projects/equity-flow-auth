@@ -109,10 +109,14 @@ class AuthService(auth_pb2_grpc.AuthServiceServicer):
         try:
             payload = jwt.decode(request.token, SECRET_KEY, algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
-            return auth_pb2.DecodeTokenResponse()
+            return auth_pb2.DecodeTokenResponse(success=False, message="Token expired")
 
         return auth_pb2.DecodeTokenResponse(
-            user_id=str(payload["user_id"]),
-            email=payload.get("email", ""),
-            role=payload.get("role", ""),
+            success=True,
+            message="Token decoded successfully",
+            data={
+                "user_id": str(payload["user_id"]),
+                "email": payload.get("email", ""),
+                "role": payload.get("role", ""),
+            },
         )
