@@ -1,3 +1,4 @@
+from datetime import timedelta
 from pathlib import Path
 
 from decouple import config
@@ -115,3 +116,8 @@ STATIC_URL = "static/"
 
 TELEGRAM_BOT = config("TELEGRAM_BOT", default=None)
 TELEGRAM_GROUP_ID = config("TELEGRAM_GROUP_ID", default=None)
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+}

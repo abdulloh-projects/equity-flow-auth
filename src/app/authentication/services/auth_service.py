@@ -13,6 +13,12 @@ ROLE_MAP = {
     "startupper": auth_pb2.STARTUPPER,
 }
 
+PROTO_ROLE_MAP = {
+    auth_pb2.INVESTOR: "investor",
+    auth_pb2.ADMIN: "admin",
+    auth_pb2.STARTUPPER: "startupper",
+}
+
 
 class AuthService(auth_pb2_grpc.AuthServiceServicer):
     def Register(self, request, context):
@@ -25,7 +31,7 @@ class AuthService(auth_pb2_grpc.AuthServiceServicer):
                         password=request.password,
                         first_name=request.first_name,
                         last_name=request.last_name,
-                        role=request.role,
+                        role=PROTO_ROLE_MAP.get(request.role, "investor"),
                     )
                     # refresh = RefreshToken.for_user(user)
                     return auth_pb2.RegisterResponse(
@@ -55,6 +61,8 @@ class AuthService(auth_pb2_grpc.AuthServiceServicer):
             user = User.objects.get(email=request.email)
             if user.check_password(request.password):
                 refresh = RefreshToken.for_user(user)
+                refresh["role"] = user.role
+                refresh["email"] = user.email
                 return auth_pb2.LoginResponse(
                     success=True,
                     message="Login successful",
@@ -110,12 +118,15 @@ class AuthService(auth_pb2_grpc.AuthServiceServicer):
             payload = jwt.decode(request.token, SECRET_KEY, algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
             return auth_pb2.DecodeTokenResponse(success=False, message="Token expired")
+        except Exception as exc:
+            return auth_pb2.DecodeTokenResponse(success=False, message=str(exc))
 
+        user_id = payload.get("user_id") or payload.get("sub") or ""
         return auth_pb2.DecodeTokenResponse(
             success=True,
             message="Token decoded successfully",
             data={
-                "user_id": str(payload["user_id"]),
+                "user_id": str(user_id),
                 "email": payload.get("email", ""),
                 "role": payload.get("role", ""),
             },
