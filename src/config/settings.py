@@ -1,3 +1,4 @@
+from datetime import timedelta
 from pathlib import Path
 
 from decouple import Csv, config
@@ -29,6 +30,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework_simplejwt",
     "app.authentication",
+    "app.otp",
 ]
 
 MIDDLEWARE = [
@@ -109,3 +111,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+
+TELEGRAM_BOT = config("TELEGRAM_BOT", default=None)
+TELEGRAM_GROUP_ID = config("TELEGRAM_GROUP_ID", default=None)
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+}
